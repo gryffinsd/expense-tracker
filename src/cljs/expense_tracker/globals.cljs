@@ -3,8 +3,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; globals
 
-(defonce acc-types [:asset :liability :income :expense])
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; default-values
 ;;    balance 0
