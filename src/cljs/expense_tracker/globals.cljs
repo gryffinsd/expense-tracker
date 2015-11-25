@@ -1,4 +1,27 @@
-(ns expense-tracker.globals)
+(ns expense-tracker.globals
+  (:require [clojure.string :as str]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; helpers
+
+(defn normalize-name [name]
+  (str/replace name " " "-"))
+
+(defn gan-helper [accounts prefix rslt]
+  (if (empty? accounts)
+    rslt
+    (let [f (first accounts)
+          new-prefix (str prefix ":" (normalize-name (:name f)))]
+      (if-let [children (:children f)]
+        (gan-helper (rest accounts)
+                       prefix
+                       (apply conj rslt new-prefix
+                              (flatten (mapv #(gan-helper [%] new-prefix [])
+                                             children))))
+        (gan-helper (rest accounts) prefix (conj rslt new-prefix))))))
+
+(defn gen-acc-names [accounts]
+  (mapv #(subs % 1) (gan-helper accounts "" [])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; globals
@@ -11,65 +34,44 @@
 ;;    children []
 ;; notes
 ;;    children will have same :type as that of parent
-(defonce accounts (atom [;; assets
-                         {:name "cash"
-                          :type :asset}
-                         {:name "bank account"
-                          :type :asset}
-                         {:name "fixed deposit"
-                          :type :asset}
-                         ;; liabilities
-                         {:name "credit card"
-                          :type :liability}
-                         {:name "loan"
-                          :type :liability}
-                         ;; income
-                         {:name "salary"
-                          :type :income}
-                         {:name "interest"
-                          :type :income}
-                         {:name "gifts"
-                          :type :income}
-                         ;; expenses
-                         {:name "groceries"
-                          :type :expense}
-                         {:name "vehicle"
-                          :type :expense
-                          :children [{:name "fuel"}
-                                     {:name "repairs"}]}
-                         {:name "shopping"
-                          :type :expense}
-                         {:name "clothes"
-                          :type :expense}
-                         {:name "jewellery"
-                          :type :expense}
-                         {:name "dining"
-                          :type :expense}
-                         {:name "furniture"
-                          :type :expense}
-                         {:name "appliances"
-                          :type :expense}
-                         {:name "entertainment"
-                          :type :expense
-                          :children [{:name "movies"}]}
-                         {:name "utilities"
-                          :type :expense
-                          :children [{:name "electricity"}
-                                     {:name "phone"}
-                                     {:name "gas"}
-                                     {:name "internet"}]}
-                         {:name "household"
-                          :type :expense
-                          :children [{:name "maid"}
-                                     {:name "laundry"}
-                                     {:name "rent"}
-                                     {:name "repairs"}]}
-                         {:name "gifts"
-                          :type :expense}
-                         {:name "vacation"
-                          :type :expense
-                          :children [{:name "transport"}
-                                     {:name "accomodation"}
-                                     {:name "dining"}]}
-                         {:name "transportation"
-                          :type :expense}]))
+(defonce accounts (atom [{:name "asset"
+                          :children [{:name "cash"}
+                                     {:name "bank account"}
+                                     {:name "fixed deposit"}]}
+                         {:name "liability"
+                          :children [{:name "credit card"}
+                                     {:name "loan"}]}
+                         {:name "income"
+                          :children [{:name "salary"}
+                                     {:name "interest"}
+                                     {:name "gifts"}]}
+                         {:name "expense"
+                          :children [{:name "groceries"}
+                                     {:name "vehicle"
+                                      :children [{:name "fuel"}
+                                                 {:name "repairs"}]}
+                                     {:name "shopping"}
+                                     {:name "clothes"}
+                                     {:name "jewellery"}
+                                     {:name "dining"}
+                                     {:name "furniture"}
+                                     {:name "appliances"}
+                                     {:name "entertainment"
+                                      :children [{:name "movies"}]}
+                                     {:name "utilities"
+                                      :children [{:name "electricity"}
+                                                 {:name "phone"}
+                                                 {:name "gas"}
+                                                 {:name "internet"}]}
+                                     {:name "household"
+                                      :children [{:name "maid"}
+                                                 {:name "laundry"}
+                                                 {:name "rent"}
+                                                 {:name "repairs"}]}
+                                     {:name "gifts"}
+                                     {:name "vacation"
+                                      :children [{:name "transportation"}
+                                                 {:name "accomodation"}
+                                                 {:name "dining"}]}
+                                     {:name "transportation"}]}]))
+(defonce account-names (atom (gen-acc-names @accounts)))
