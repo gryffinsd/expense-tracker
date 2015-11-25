@@ -13,10 +13,9 @@
 
 (defn c-main []
   [:div.container
-   [:div (m/c-menu)]
-   [tr/c-add-transaction]
-   #_[nw/c-net-worth]])
+   [m/c-menu]
+   (condp = @g/app-page
+     :home [nw/c-net-worth]
+     :trans-add [tr/c-add-transaction])])
 
-(defn main []
-  (r/render-component [c-main]
-                      (. js/document (getElementById "app"))))
+(defn main [] (r/render-component [c-main] (. js/document (getElementById "app"))))

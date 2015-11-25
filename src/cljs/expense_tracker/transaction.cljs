@@ -64,7 +64,7 @@ accounts should be the same,
 and not-equal-to ZERO")
                       (do (swap! g/transactions conj @app-state)
                           (reset! app-state (new-state)))))
-            (snd [] nil)]
+            (snd [] (when (snn) (reset! g/app-page :home)))]
       [:div [:datalist {:id "acc-names"}
              (for [an @g/account-names]
                ^{:key (u/random)}[:option {:value an}])]

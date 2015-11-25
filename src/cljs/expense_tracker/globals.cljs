@@ -1,5 +1,6 @@
 (ns expense-tracker.globals
-  (:require [clojure.string :as str]))
+  (:require [reagent.core :as r]
+            [clojure.string :as str]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -26,14 +27,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; globals
 
+(defonce app-page (r/atom :home))
 (defonce transactions (atom []))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;
-;; default-values
-;;    balance 0
-;;    children []
-;; notes
-;;    children will have same :type as that of parent
+;; default-values: balance 0, children []
 (defonce accounts (atom [{:name "asset"
                           :children [{:name "cash"}
                                      {:name "bank account"}
