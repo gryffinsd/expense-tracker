@@ -47,6 +47,7 @@
 
                    :figwheel {:http-server-root "public"
                               :server-port 3449
+                              :nrepl-port 7889
                               :css-dirs ["resources/public/css"]
                               :ring-handler expense-tracker.server/http-handler}
 
