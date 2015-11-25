@@ -3,6 +3,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; globals
 
+(defonce transactions (atom []))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; default-values
 ;;    balance 0

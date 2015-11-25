@@ -7,6 +7,7 @@
 (defn log [& args] (.log js/console (apply str args)))
 (defn alert [& args] (js/alert (apply str args)))
 (defn contains [haystack needle] (when haystack (>= (.indexOf haystack needle) 0)))
+(defn random [] (.random js/Math))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; DOM utils
