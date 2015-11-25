@@ -1,19 +1,23 @@
 (ns expense-tracker.net-worth
-  (:require [expense-tracker.globals :as g]))
+  (:require [expense-tracker.globals :as g]
+            [expense-tracker.utils :as u]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
 
-(defn nw-helper [typeof]
+(defn nw-helper [children]
   [:table.table.table-bordered.table-striped
-   (map (fn [s]
-          ^{:key (str typeof "-" (:name s))}
-          [:tr [:td [:a.text-capitalize {:href (str "/trans/" (:name s))} (:name s)]]
-           [:td (or (:balance s) 0)]])
-        (filter #(= typeof (:type %)) @g/accounts))
+   (map (fn [n]
+          ^{:key (u/random)}
+          [:tr [:td [:a.text-capitalize {:href (str "/trans/" (:name n))} (:name n)]]
+           [:td (or (:balance n) 0)]])
+        children)
    [:tr [:td [:strong "Total"]]
     [:td (reduce + (map #(or (:balance %) 0)
-                        (filter #(= typeof (:type %)) @g/accounts)))]]])
+                        children))]]])
+
+(defn get-children [parent]
+  (:children (first (filter #(= parent (:name %)) @g/accounts))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
@@ -21,8 +25,8 @@
 (defn c-net-worth []
   [:div.row
    [:div.col-sm-6
-    [:h3 "Assets"] (nw-helper :asset)
-    [:h3 "Income"] (nw-helper :income)]
+    [:h3 "Assets"] (nw-helper (get-children "asset"))
+    [:h3 "Income"] (nw-helper (get-children "income"))]
    [:div.col-sm-6
-    [:h3 "Liabilities"] (nw-helper :liability)
-    [:h3 "Expenses"] (nw-helper :expense)]])
+    [:h3 "Liabilities"] (nw-helper (get-children "liability"))
+    [:h3 "Expenses"] (nw-helper (get-children "expense"))]])
