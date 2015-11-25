@@ -4,17 +4,15 @@
             [expense-tracker.globals :as g]
             [clojure.string :as str]))
 
-(declare new-state)
+(defn new-state []
+  {:to 0 :from 0
+   :trans [(atom {:id 0 :type :to :val 0 :acc ""})
+           (atom {:id 1 :type :from :val 0 :acc ""})]})
 (defonce app-state (r/atom (new-state)))
 (defonce tmp (atom 0))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
-
-(defn new-state []
-  {:to 0 :from 0
-   :trans [(atom {:id 0 :type :to :val 0 :acc ""})
-           (atom {:id 1 :type :from :val 0 :acc ""})]})
 
 (defn new-trans [typeof] {:id (count @app-state) :val 0 :type typeof})
 
