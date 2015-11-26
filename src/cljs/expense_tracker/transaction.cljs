@@ -49,7 +49,8 @@
                                :onChange #(amt-validate % t)
                                :onFocus #(amt-of % t)
                                :onBlur #(amt-ob % t)}]
-     [:span [:a {:href "#" :onClick rm} "Rm"]]]))
+     [:p.del [:a {:href "#" :onClick rm}
+          [:span.glyphicon.glyphicon-minus-sign {:aria-hidden "true"}]]]]))
 
 (defn c-add-transaction []
   (let [tos (filter #(= :to (:type @%)) (:trans @app-state))
@@ -77,18 +78,20 @@ and not-equal-to ZERO")
                ^{:key (u/random)}[:option {:value an}])]
        [:div.row [:div.col-sm-12 [:label "Date"]
                   [:input.form-control {:id "trans-date"
-                                        :type "date"
+                                        :type "text"
                                         :placeholder (:date @app-state)
                                         :onFocus datepicker}]]]
        [:div.row
              [:div.col-sm-6
               [:h2 "To Account(s)"
-               [:small.pull-right [:a {:href "#" :onClick #(split % :to)} "Split"]]]
+               [:small.pull-right [:a {:href "#" :onClick #(split % :to)}
+                                   [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
               [:ul.list-unstyled.clearfix (for [x tos] ^{:key (u/random)} [c-trans x])]
               [:h3 "Total " [:span.pull-right (:to @app-state)]]]
              [:div.col-sm-6
               [:h2 "From Account(s)"
-               [:small.pull-right [:a {:href "#" :onClick #(split % :from)} "Split"]]]
+               [:small.pull-right [:a {:href "#" :onClick #(split % :from)}
+                                   [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
               [:ul.list-unstyled.clearfix (for [x froms] ^{:key (u/random)} [c-trans x])]
               [:h3 "Total " [:span.pull-right (:from @app-state)]]]]
        [:div.row
