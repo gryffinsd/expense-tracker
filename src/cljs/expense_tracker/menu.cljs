@@ -3,23 +3,29 @@
 
 (defn c-menu []
   [:div.navbar.navbar-default
-   [:div.navbar-header
-    [:a.navbar-brand {:href "#"} "Gryffin -- Expense Tracker"]
-    [:div.btn-group
-     [:ul
+   [:div.container-fluid
+    [:div.navbar-header
+     [:a.navbar-brand {:href "#"} "Expense Tracker"]]
+    [:div.collapse.navbar-collapse
+     [:ul.nav.navbar-nav
       [:li [:a {:href "#" :onClick #(reset! g/app-page :home)} "Home"]]
-      [:li "Transactions"
-       [:ul
-        [:li "View"]
-        [:li [:a {:href "#" :onClick #(reset! g/app-page :trans-add)} "Add"]] ;
-        [:li "Edit"]
-        [:li "Delete"]]]
-      [:li "Accounts"
-       [:ul
-        [:li "Add"]
-        [:li "Edit"]
-        [:li "Delete"]]]
-      [:li "Reports"
-       [:ul
-        [:li "Net Worth"]
-        [:li "Time-Periods"]]]]]]])
+      [:li [:a {:href "#" :onClick #(reset! g/app-page :trans-add)} "Add Transaction"]]
+      [:li.dropdown [:a.dropdown-toggle {:href "#"
+                                         :data-toggle "dropdown"
+                                         :role "button"
+                                         :aria-haspopup "true"
+                                         :aria-expanded "false"}
+                     "Accounts" [:span.caret]]
+       [:ul.dropdown-menu
+        [:li [:a {:href "#" :onClick #(reset! g/app-page :acc-view)} "View"]]
+        [:li [:a {:href "#" :onClick #(reset! g/app-page :acc-add)} "Add New"]]]]
+      [:li.dropdown [:a.dropdown-toggle {:href "#"
+                                         :data-toggle "dropdown"
+                                         :role "button"
+                                         :aria-haspopup "true"
+                                         :aria-expanded "false"}
+                     "Reports by" [:span.caret]]
+       [:ul.dropdown-menu
+        [:li [:a {:href "#" :onClick #(reset! g/app-page :rep-pie)} "Time Period"]]
+        #_[:li.divider {:role "separator"}]
+        [:li [:a {:href "#" :onClick #(reset! g/app-page :rep-bar)} "Account"]]]]]]]])
