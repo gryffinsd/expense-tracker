@@ -15,7 +15,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
 
-(defn new-trans [typeof] {:id (count @app-state) :val 0 :type typeof})
+(defn new-trans [typeof] {:id (count (:trans @app-state)) :val 0 :type typeof})
 
 (defn acc-validate [e t]
   (let [acc (str/trim (.-value (.-target e)))]
@@ -41,7 +41,9 @@
 ;; components and views
 
 (defn c-trans [t]
-  (letfn [(rm [] (swap! app-state #(remove (fn [x] (= (:id @t) (:id @x))) %)))]
+  (letfn [(rm []
+            (swap! app-state update-in [:trans] #(remove (fn [x] (= (:id @t) (:id @x))) %))
+            (swap! app-state update-in [(:type @t)] #(- % (:val @t))))]
     [:li [:input.form-control.acc {:type "text" :list "acc-names"
                                    :placeholder (:acc @t)
                                    :onBlur #(acc-validate % t)}]
