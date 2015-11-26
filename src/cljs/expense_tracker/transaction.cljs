@@ -2,10 +2,11 @@
   (:require [reagent.core :as r]
             [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [jayq.core :as jq]))
 
 (defn new-state []
-  {:to 0 :from 0
+  {:to 0 :from 0 :date ""
    :trans [(atom {:id 0 :type :to :val 0 :acc ""})
            (atom {:id 1 :type :from :val 0 :acc ""})]})
 (defonce app-state (r/atom (new-state)))
@@ -18,7 +19,8 @@
 
 (defn acc-validate [e t]
   (let [acc (str/trim (.-value (.-target e)))]
-    (if (or (= acc "") (empty? (filter #(= acc %) @g/account-names)))
+    (if (and (= (:acc @t) "")
+             (or (= acc "") (empty? (filter #(= acc %) @g/account-names))))
       (u/alert "Non-existent account!")
       (swap! t assoc :acc acc))))
 
@@ -52,22 +54,32 @@
 (defn c-add-transaction []
   (let [tos (filter #(= :to (:type @%)) (:trans @app-state))
         froms (filter #(= :from (:type @%)) (:trans @app-state))]
-    (letfn [(split [_ to-from]
-              (swap! app-state
-                     update-in [:trans]
-                     conj (atom (new-trans to-from))))
-            (snn [] (if (or (zero? (:to @app-state))
-                            (zero? (:from @app-state))
-                            (not (amt-equal)))
-                      (u/alert "Amounts in both \"to\" and \"from\"
+    (letfn [(split [_ to-from] (swap! app-state
+                                      update-in [:trans]
+                                      conj (atom (new-trans to-from))))
+            (datepicker [] (.datepicker (jq/$ "#trans-date")))
+            (snn [] (let [date (.-value (u/by-id "trans-date"))]
+                      (cond (or (zero? (:to @app-state))
+                                (zero? (:from @app-state))
+                                (not (amt-equal)))
+                            (u/alert "Amounts in both \"to\" and \"from\"
 accounts should be the same,
 and not-equal-to ZERO")
-                      (do (swap! g/transactions conj @app-state)
-                          (reset! app-state (new-state)))))
+                            (= date "")
+                            (u/alert "Date field cannot be empty!")
+                            :else
+                            (do (swap! g/transactions conj (conj @app-state
+                                                                 {:date date}))
+                                (reset! app-state (new-state))))))
             (snd [] (when (snn) (reset! g/app-page :home)))]
       [:div [:datalist {:id "acc-names"}
              (for [an @g/account-names]
                ^{:key (u/random)}[:option {:value an}])]
+       [:div.row [:div.col-sm-12 [:label "Date"]
+                  [:input.form-control {:id "trans-date"
+                                        :type "date"
+                                        :placeholder (:date @app-state)
+                                        :onFocus datepicker}]]]
        [:div.row
              [:div.col-sm-6
               [:h2 "To Account(s)"

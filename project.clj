@@ -15,7 +15,8 @@
                  [compojure "1.3.2"]
                  [enlive "1.1.6"]
                  [reagent "0.5.1"]
-                 [environ "1.0.0"]]
+                 [environ "1.0.0"]
+                 [jayq "2.5.4"]]
 
   :plugins [[lein-cljsbuild "1.0.5"]
             [lein-environ "1.0.0"]]
