@@ -11,11 +11,11 @@
     (map (fn [n]
            ^{:key (u/random)}
            [:tr [:td [:a.text-capitalize {:href (str "/trans/" (:name n))} (:name n)]]
-            [:td (or (:balance n) 0)]])
+            [:td (or (:bal n) 0)]])
          children)
     [:tr [:td [:strong "Total"]]
-     [:td (reduce + (map #(or (:balance %) 0)
-                         children))]]]])
+     [:td [:strong (reduce + (map #(or (:bal %) 0)
+                                  children))]]]]])
 
 (defn get-children [parent]
   (:children (first (filter #(= parent (:name %)) @g/accounts))))

@@ -5,14 +5,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
 
-(defn normalize-name [name]
-  (str/replace name " " "-"))
-
 (defn gan-helper [accounts prefix rslt]
   (if (empty? accounts)
     rslt
     (let [f (first accounts)
-          new-prefix (str prefix ":" (normalize-name (:name f)))]
+          new-prefix (str prefix ":" (:name f))]
       (if-let [children (:children f)]
         (gan-helper (rest accounts)
                        prefix
@@ -21,8 +18,11 @@
                                              children))))
         (gan-helper (rest accounts) prefix (conj rslt new-prefix))))))
 
-(defn gen-acc-names [accounts]
-  (mapv #(subs % 1) (gan-helper accounts "" [])))
+(defn accs->names [accounts]
+  (into []
+        (remove #(or (= % "asset") (= % "income")
+                     (= % "liability") (= % "expense"))
+                (map #(subs % 1) (gan-helper accounts "" [])))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; globals
@@ -30,45 +30,43 @@
 (defonce app-page (r/atom :home))
 (defonce transactions (atom []))
 
-;; default-values: balance 0, children []
-(defonce accounts (atom [{:name "asset"
-                          :children [{:name "cash"}
-                                     {:name "bank account"}
-                                     {:name "fixed deposit"}]}
-                         {:name "liability"
-                          :children [{:name "credit card"}
-                                     {:name "loan"}]}
-                         {:name "income"
-                          :children [{:name "salary"}
-                                     {:name "interest"}
-                                     {:name "gifts"}]}
-                         {:name "expense"
-                          :children [{:name "groceries"}
-                                     {:name "vehicle"
-                                      :children [{:name "fuel"}
-                                                 {:name "repairs"}]}
-                                     {:name "shopping"}
-                                     {:name "clothes"}
-                                     {:name "jewellery"}
-                                     {:name "dining"}
-                                     {:name "furniture"}
-                                     {:name "appliances"}
-                                     {:name "entertainment"
-                                      :children [{:name "movies"}]}
-                                     {:name "utilities"
-                                      :children [{:name "electricity"}
-                                                 {:name "phone"}
-                                                 {:name "gas"}
-                                                 {:name "internet"}]}
-                                     {:name "household"
-                                      :children [{:name "maid"}
-                                                 {:name "laundry"}
-                                                 {:name "rent"}
-                                                 {:name "repairs"}]}
-                                     {:name "gifts"}
-                                     {:name "vacation"
-                                      :children [{:name "transportation"}
-                                                 {:name "accomodation"}
-                                                 {:name "dining"}]}
-                                     {:name "transportation"}]}]))
-(defonce account-names (atom (gen-acc-names @accounts)))
+(defonce accounts (atom [{:name "asset" :bal 0
+                          :children [{:name "cash" :bal 0}
+                                     {:name "bank account" :bal 0}
+                                     {:name "fixed deposit" :bal 0}]}
+                         {:name "liability" :bal 0
+                          :children [{:name "credit card" :bal 0}
+                                     {:name "loan" :bal 0}]}
+                         {:name "income" :bal 0
+                          :children [{:name "salary" :bal 0}
+                                     {:name "interest" :bal 0}
+                                     {:name "gifts" :bal 0}]}
+                         {:name "expense" :bal 0
+                          :children [{:name "groceries" :bal 0}
+                                     {:name "vehicle" :bal 0
+                                      :children [{:name "fuel" :bal 0}
+                                                 {:name "repairs" :bal 0}]}
+                                     {:name "shopping" :bal 0}
+                                     {:name "clothes" :bal 0}
+                                     {:name "jewellery" :bal 0}
+                                     {:name "dining" :bal 0}
+                                     {:name "furniture" :bal 0}
+                                     {:name "appliances" :bal 0}
+                                     {:name "entertainment" :bal 0
+                                      :children [{:name "movies" :bal 0}]}
+                                     {:name "utilities" :bal 0
+                                      :children [{:name "electricity" :bal 0}
+                                                 {:name "phone" :bal 0}
+                                                 {:name "gas" :bal 0}
+                                                 {:name "internet" :bal 0}]}
+                                     {:name "household" :bal 0
+                                      :children [{:name "maid" :bal 0}
+                                                 {:name "laundry" :bal 0}
+                                                 {:name "rent" :bal 0}
+                                                 {:name "repairs" :bal 0}]}
+                                     {:name "gifts" :bal 0}
+                                     {:name "vacation" :bal 0
+                                      :children [{:name "transportation" :bal 0}
+                                                 {:name "accomodation" :bal 0}
+                                                 {:name "dining" :bal 0}]}
+                                     {:name "transportation" :bal 0}]}]))

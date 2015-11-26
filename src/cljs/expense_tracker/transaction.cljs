@@ -20,7 +20,7 @@
 (defn acc-validate [e t]
   (let [acc (str/trim (.-value (.-target e)))]
     (if (and (= (:acc @t) "")
-             (or (= acc "") (empty? (filter #(= acc %) @g/account-names))))
+             (or (= acc "") (empty? (filter #(= acc %) (g/accs->names @g/accounts)))))
       (u/alert "Non-existent account!")
       (swap! t assoc :acc acc))))
 
@@ -36,6 +36,28 @@
                   (= (str f) val))
       (u/alert "Only numbers and decimal allowed!"))
     (swap! t assoc :val (if (= val "") 0 f))))
+
+(defn find-index [haystack needle key]
+  (loop [hs haystack, i 0]
+    (if (= (key (first hs)) needle)
+      i
+      (recur (rest hs) (inc i)))))
+
+(defn update-accounts [trans]
+  (mapv (fn [x]
+          (let [t @x]
+            (loop [accs (str/split (:acc t) ":")
+                   update-path []
+                   root @g/accounts]
+              (when-not (empty? accs)
+                (let [nm (first accs)
+                      idx (find-index root nm :name)]
+                  (swap! g/accounts update-in (conj update-path idx :bal)
+                         #(if (= (:type t) :to) (+ % (:val t)) (- % (:val t))))
+                  (recur (rest accs)
+                         (conj update-path idx :children)
+                         (:children (nth root idx))))))))
+        trans))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
@@ -73,10 +95,11 @@ and not-equal-to ZERO")
                             :else
                             (do (swap! g/transactions conj (conj @app-state
                                                                  {:date date}))
+                                (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))
             (snd [] (when (snn) (reset! g/app-page :home)))]
       [:div [:datalist {:id "acc-names"}
-             (for [an @g/account-names]
+             (for [an (g/accs->names @g/accounts)]
                ^{:key (u/random)}[:option {:value an}])]
        [:div.row [:div.col-sm-12 [:label "Date"]
                   [:input.form-control {:id "trans-date"
