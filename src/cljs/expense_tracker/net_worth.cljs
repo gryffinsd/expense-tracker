@@ -1,33 +1,46 @@
 (ns expense-tracker.net-worth
   (:require [expense-tracker.globals :as g]
-            [expense-tracker.utils :as u]))
+            [expense-tracker.utils :as u]
+            [jayq.core :as jq]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
 
-(defn nw-helper [children]
-  [:table.table.table-bordered.table-striped
-   [:tbody
-    (map (fn [n]
-           ^{:key (u/random)}
-           [:tr [:td [:a.text-capitalize {:href (str "/trans/" (:name n))} (:name n)]]
-            [:td (or (:bal n) 0)]])
-         children)
-    [:tr [:td [:strong "Total"]]
-     [:td [:strong (reduce + (map #(or (:bal %) 0)
-                                  children))]]]]])
-
 (defn get-children [parent]
   (:children (first (filter #(= parent (:name %)) @g/accounts))))
+
+(defn toggle-ul [e]
+  (let [ul (aget (.. e -target -parentElement -parentElement -children) 3)
+        classes (.-className ul)]
+    (if (u/contains classes "show")
+      (set! (.-className ul) "list-unstyled hidden")
+      (set! (.-className ul) "list-unstyled show"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
 
+(defn c-nw-helper [children & root?]
+  [:ul.list-unstyled {:className (if root? "hidden" "show")}
+   (map (fn [child idx]
+          (let [grand-children (:children child)]
+            ^{:key (u/random)}
+            [:li {:className (if (zero? (mod idx 2)) "bg-warning" "bg-info")}
+             (when grand-children
+               [:a.glyph {:href "#"} [:span.glyphicon.glyphicon-collapse-down {:onClick toggle-ul}]])
+             [:span [:a.text-capitalize {:href (str "/trans/" (:name child))} (:name child)]]
+             [:span.pull-right (or (:bal child) 0)]
+             (when grand-children
+                 (c-nw-helper grand-children true))]))
+        children (range))
+   [:li.panel.panel-default [:span [:strong "Total"]]
+    [:span.pull-right [:strong (reduce + (map #(or (:bal %) 0)
+                                              children))]]]])
+
 (defn c-net-worth []
-  [:div.row
+  [:div.row {:id "nw"}
    [:div.col-sm-6
-    [:h3 "Assets"] (nw-helper (get-children "asset"))
-    [:h3 "Income"] (nw-helper (get-children "income"))]
+    [:h3 "Assets"] (c-nw-helper (get-children "asset"))
+    [:h3 "Income"] (c-nw-helper (get-children "income"))]
    [:div.col-sm-6
-    [:h3 "Liabilities"] (nw-helper (get-children "liability"))
-    [:h3 "Expenses"] (nw-helper (get-children "expense"))]])
+    [:h3 "Liabilities"] (c-nw-helper (get-children "liability"))
+    [:h3 "Expenses"] (c-nw-helper (get-children "expense"))]])
