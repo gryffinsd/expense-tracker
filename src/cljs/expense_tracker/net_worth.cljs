@@ -30,7 +30,7 @@
              (when grand-children
                [:a.glyph {:href "#"}
                 [:span.glyphicon.glyphicon-collapse-down {:onClick toggle-ul}]])
-             [:a.text-capitalize {:href "#" :onClick #(u/a-href % href)} nm]
+             [:a.text-capitalize {:href "#" :onClick #(u/trans-view % {:href href})} nm]
              [:span.pull-right (or (:bal child) 0)]
              (when grand-children
                [c-nw-helper grand-children href])]))

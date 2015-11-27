@@ -98,7 +98,8 @@ and not-equal-to ZERO")
                             (u/alert "Date field cannot be empty!")
                             :else
                             (do #_(println @g/transactions)
-                                (swap! g/transactions conj (conj @app-state {:date date}))
+                                (swap! g/transactions conj
+                                       (conj @app-state {:date (u/jq->long date)}))
                                 #_(println @g/transactions)
                                 (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))

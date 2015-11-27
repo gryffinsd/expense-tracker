@@ -24,7 +24,19 @@
   (.appendChild parent child))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; moment.js
+
+(def local-fmt "DD-MON-YYYY")
+(def long-fmt "YYYYMMDD")
+(def jq-fmt "MM/DD/YYYY")
+(defn now [] (.moment js/window))
+(defn ->m [arg fmt] (.moment js/window arg fmt))
+(defn m-> [arg fmt] (.format arg fmt))
+(defn jq->long [arg] (-> arg (->m jq-fmt) (m-> long-fmt)))
+(defn long->local [arg] (-> arg (->m long-fmt) (m-> local-fmt)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
-(defn a-href [_ href]
-  (reset! g/app-page {:page :trans-view :attrs {:href href}}))
+(defn trans-view [_ attrs]
+  (reset! g/app-page {:page :trans-view :attrs attrs}))
