@@ -33,10 +33,7 @@
 ;; components and views
 
 (defn c-acc [[href _]]
-  (letfn [(a-href [e]
-            (reset! g/app-page {:page :trans-view
-                                :attrs {:href href}}))]
-    [:a {:href "#" :onClick a-href :style {:margin-right "1em"}} href]))
+  [:a {:href "#" :onClick #(u/a-href % href) :style {:margin-right "1em"}} href])
 
 (defn c-view-transaction []
   (let [href (:href (:attrs @g/app-page))

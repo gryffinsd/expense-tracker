@@ -1,4 +1,5 @@
-(ns expense-tracker.utils)
+(ns expense-tracker.utils
+  (:require [expense-tracker.globals :as g]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; utils
@@ -21,3 +22,9 @@
     ele))
 (defn append-child [parent child]
   (.appendChild parent child))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; misc
+
+(defn a-href [_ href]
+  (reset! g/app-page {:page :trans-view :attrs {:href href}}))

@@ -16,10 +16,6 @@
       (set! (.-className ul) "list-unstyled hidden")
       (set! (.-className ul) "list-unstyled show"))))
 
-(defn a-href [e href]
-  (reset! g/app-page {:page :trans-view
-                      :attrs {:href href}}))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
 
@@ -34,7 +30,7 @@
              (when grand-children
                [:a.glyph {:href "#"}
                 [:span.glyphicon.glyphicon-collapse-down {:onClick toggle-ul}]])
-             [:a.text-capitalize {:href "#" :onClick #(a-href % href)} nm]
+             [:a.text-capitalize {:href "#" :onClick #(u/a-href % href)} nm]
              [:span.pull-right (or (:bal child) 0)]
              (when grand-children
                [c-nw-helper grand-children href])]))
