@@ -2,8 +2,12 @@
   (:require [reagent.core :as r]
             [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
+            [expense-tracker.accounts :as a]
             [clojure.string :as str]
             [jayq.core :as jq]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; local states
 
 (defn new-state []
   {:to 0 :from 0 :date ""
@@ -20,7 +24,7 @@
 (defn acc-validate [e t]
   (let [acc (str/trim (.-value (.-target e)))]
     (if (and (= (:acc @t) "")
-             (or (= acc "") (empty? (filter #(= acc %) (g/accs->names @g/accounts)))))
+             (or (= acc "") (empty? (filter #(= acc %) (a/accs->names @g/accounts)))))
       (u/alert "Non-existent account!")
       (swap! t assoc :acc acc))))
 
@@ -99,7 +103,7 @@ and not-equal-to ZERO")
                                 (reset! app-state (new-state))))))
             (snd [] (when (snn) (reset! g/app-page :home)))]
       [:div [:datalist {:id "acc-names"}
-             (for [an (g/accs->names @g/accounts)]
+             (for [an (a/accs->names @g/accounts)]
                ^{:key (u/random)}[:option {:value an}])]
        [:div.row [:div.col-sm-12 [:label "Date"]
                   [:input.form-control {:id "trans-date"
