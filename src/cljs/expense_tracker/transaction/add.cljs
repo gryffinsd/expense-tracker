@@ -26,7 +26,7 @@
     (if (and (= (:acc @t) "")
              (or (= acc "") (empty? (filter #(= acc %) (a/accs->names @g/accounts)))))
       (u/alert "Non-existent account!")
-      (swap! t assoc :acc acc))))
+      (swap! t assoc :acc (if-not (= acc "") acc (:acc @t))))))
 
 (defn amt-equal [] (= (:to @app-state) (:from @app-state)))
 (defn amt-of [e t] (reset! tmp (:val @t)))
