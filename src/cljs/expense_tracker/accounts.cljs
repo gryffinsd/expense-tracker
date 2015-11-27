@@ -1,6 +1,4 @@
-(ns expense-tracker.accounts
-  (:require [reagent.core :as r]
-            [clojure.string :as str]))
+(ns expense-tracker.accounts)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers

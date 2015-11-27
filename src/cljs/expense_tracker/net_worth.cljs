@@ -16,21 +16,28 @@
       (set! (.-className ul) "list-unstyled hidden")
       (set! (.-className ul) "list-unstyled show"))))
 
+(defn a-href [e href]
+  (reset! g/app-page {:page :trans-view
+                      :attrs {:href href}}))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
 
-(defn c-nw-helper [children & root?]
-  [:ul.list-unstyled {:className (if root? "hidden" "show")}
+(defn c-nw-helper [children path]
+  [:ul.list-unstyled {:className (if (u/contains path ":") "hidden" "show")}
    (map (fn [child idx]
-          (let [grand-children (:children child)]
+          (let [nm (:name child)
+                href (str path ":" nm)
+                grand-children (:children child)]
             ^{:key (u/random)}
             [:li {:className (if (zero? (mod idx 2)) "bg-warning" "bg-info")}
              (when grand-children
-               [:a.glyph {:href "#"} [:span.glyphicon.glyphicon-collapse-down {:onClick toggle-ul}]])
-             [:span [:a.text-capitalize {:href (str "/trans/" (:name child))} (:name child)]]
+               [:a.glyph {:href "#"}
+                [:span.glyphicon.glyphicon-collapse-down {:onClick toggle-ul}]])
+             [:a.text-capitalize {:href "#" :onClick #(a-href % href)} nm]
              [:span.pull-right (or (:bal child) 0)]
              (when grand-children
-                 (c-nw-helper grand-children true))]))
+               [c-nw-helper grand-children href])]))
         children (range))
    [:li.panel.panel-default [:span [:strong "Total"]]
     [:span.pull-right [:strong (reduce + (map #(or (:bal %) 0)
@@ -39,8 +46,8 @@
 (defn c-net-worth []
   [:div.row {:id "nw"}
    [:div.col-sm-6
-    [:h3 "Assets"] (c-nw-helper (get-children "asset"))
-    [:h3 "Income"] (c-nw-helper (get-children "income"))]
+    [:h3 "Assets"] (c-nw-helper (get-children "asset") "asset")
+    [:h3 "Income"] (c-nw-helper (get-children "income") "income")]
    [:div.col-sm-6
-    [:h3 "Liabilities"] (c-nw-helper (get-children "liability"))
-    [:h3 "Expenses"] (c-nw-helper (get-children "expense"))]])
+    [:h3 "Liabilities"] (c-nw-helper (get-children "liability") "liability")
+    [:h3 "Expenses"] (c-nw-helper (get-children "expense") "expense")]])

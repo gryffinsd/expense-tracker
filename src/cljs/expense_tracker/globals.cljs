@@ -5,7 +5,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global states
 
-(defonce app-page (r/atom :home))
+(defonce app-page (r/atom {:page :home
+                           :attrs nil}))
 (defonce transactions (atom []))
 (defonce accounts (atom [{:name "asset" :bal 0
                           :children [{:name "cash" :bal 0}

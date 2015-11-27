@@ -1,4 +1,4 @@
-(ns expense-tracker.transaction
+(ns expense-tracker.transaction.add
   (:require [reagent.core :as r]
             [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
@@ -101,7 +101,7 @@ and not-equal-to ZERO")
                                                                  {:date date}))
                                 (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))
-            (snd [] (when (snn) (reset! g/app-page :home)))]
+            (snd [] (when (snn) (reset! g/app-page {:page :home})))]
       [:div [:datalist {:id "acc-names"}
              (for [an (a/accs->names @g/accounts)]
                ^{:key (u/random)}[:option {:value an}])]
