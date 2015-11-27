@@ -96,6 +96,10 @@ accounts should be the same,
 and not-equal-to ZERO")
                             (= date "")
                             (u/alert "Date field cannot be empty!")
+                            (let [accs (mapv #(:acc @%) (:trans @app-state))]
+                              (not (= accs (into [] (into #{} accs)))))
+                            (u/alert "The same account cannot appear
+more than once in a transaction!")
                             :else
                             (do #_(println @g/transactions)
                                 (swap! g/transactions conj
