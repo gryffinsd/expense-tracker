@@ -97,8 +97,9 @@ and not-equal-to ZERO")
                             (= date "")
                             (u/alert "Date field cannot be empty!")
                             :else
-                            (do (swap! g/transactions conj (conj @app-state
-                                                                 {:date date}))
+                            (do #_(println @g/transactions)
+                                (swap! g/transactions conj (conj @app-state {:date date}))
+                                #_(println @g/transactions)
                                 (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))
             (snd [] (when (snn) (reset! g/app-page {:page :home})))]
@@ -112,17 +113,17 @@ and not-equal-to ZERO")
                                         :onFocus datepicker}]]]
        [:div.row
              [:div.col-sm-6
-              [:h2 "To Account(s)"
-               [:small.pull-right [:a {:href "#" :onClick #(split % :to)}
-                                   [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
-              [:ul.list-unstyled.clearfix (for [x tos] ^{:key (u/random)} [c-trans x])]
-              [:h3 "Total " [:span.pull-right (:to @app-state)]]]
-             [:div.col-sm-6
               [:h2 "From Account(s)"
                [:small.pull-right [:a {:href "#" :onClick #(split % :from)}
                                    [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
               [:ul.list-unstyled.clearfix (for [x froms] ^{:key (u/random)} [c-trans x])]
-              [:h3 "Total " [:span.pull-right (:from @app-state)]]]]
+              [:h3 "Total " [:span.pull-right (:from @app-state)]]]
+             [:div.col-sm-6
+              [:h2 "To Account(s)"
+               [:small.pull-right [:a {:href "#" :onClick #(split % :to)}
+                                   [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
+              [:ul.list-unstyled.clearfix (for [x tos] ^{:key (u/random)} [c-trans x])]
+              [:h3 "Total " [:span.pull-right (:to @app-state)]]]]
        [:div.row
         [:div.col-sm-6 [:button.btn.btn-default.pull-right {:onClick snd} "Save and Done"]]
         [:div.col-sm-6 [:button.btn.btn-default {:onClick snn} "Save and New"]]]])))

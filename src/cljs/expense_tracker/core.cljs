@@ -13,7 +13,7 @@
 ;; main
 
 (defn c-main []
-  [:div [m/c-menu]
+  [:div.container [m/c-menu]
    (condp = (:page @g/app-page)
      :home [nw/c-net-worth]
      :trans-add (do (reset! ta/app-state (ta/new-state))
