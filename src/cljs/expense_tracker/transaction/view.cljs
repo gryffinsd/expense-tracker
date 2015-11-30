@@ -2,7 +2,7 @@
   (:require [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
             [expense-tracker.accounts :as a]
-            [clojure.string :as string]))
+            [expense-tracker.transaction.utils :as tu]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -59,6 +59,13 @@
                                    :from (m->long (.month (.date prev 1) 0))}))
       "custom" (u/trans-view e {:href href}))))
 
+(defn rm [e t]
+  (tu/update-accounts (:trans t) + -)
+  (swap! g/transactions (fn [x] (remove #(= (:id t) (:id %)) x)))
+  (u/trans-view nil (:attrs @g/app-page)))
+
+(defn edit [e t] (reset! g/app-page {:page :trans-edit :attrs {:id (:id t)}}))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
 
@@ -80,7 +87,7 @@
             [:option {:value "prev-yr"} "Previous Year"]
             #_[:option {:value "custom"} "Custom"]]]
      [:table.table.table-striped.table-bordered
-      [:tbody [:tr [:th "Date"] [:th "From"] [:th "To"] [:th "Amount"]]
+      [:tbody [:tr [:th "Date"] [:th "From"] [:th "To"] [:th "Amount"] [:th "Manage"]]
        (for [f fltr]
          (let [from (let [rslt (individual-accs (:trans f) :from href)]
                       (if-not (empty? rslt)
@@ -98,4 +105,6 @@
                    (if (= (count from) 1)
                      (second (first from))
                      (second (first to)))
-                   (:to f))]]))]]]))
+                   (:to f))]
+            [:td [:a.glyph {:href "#"} [:span.glyphicon.glyphicon-pencil {:onClick #(edit % f)}]]
+             [:a.glyph {:href "#"} [:span.glyphicon.glyphicon-remove {:onClick #(rm % f)}]]]]))]]]))

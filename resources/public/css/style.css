@@ -1,6 +1,8 @@
+label { margin-right: 0.5em; }
+
 .acc { width: 74%; margin-right: 2%; float: left; }
 .amt { width: 15%; margin-right: 2%; float: left; }
 .del { padding-top: 0.5em; }
+.glyph { margin-right: 0.5em; }
 
 #nw li { margin: 0.5em 0; padding: 0.5em; }
-#nw .glyph { margin-right: 0.5em; }

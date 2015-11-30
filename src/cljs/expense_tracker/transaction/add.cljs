@@ -3,6 +3,7 @@
             [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
             [expense-tracker.accounts :as a]
+            [expense-tracker.transaction.utils :as tu]
             [clojure.string :as str]
             [jayq.core :as jq]))
 
@@ -41,27 +42,7 @@
       (u/alert "Only numbers and decimal allowed!"))
     (swap! t assoc :val (if (= val "") 0 f))))
 
-(defn find-index [haystack needle key]
-  (loop [hs haystack, i 0]
-    (if (= (key (first hs)) needle)
-      i
-      (recur (rest hs) (inc i)))))
-
-(defn update-accounts [trans]
-  (mapv (fn [x]
-          (let [t @x]
-            (loop [accs (str/split (:acc t) ":")
-                   update-path []
-                   root @g/accounts]
-              (when-not (empty? accs)
-                (let [nm (first accs)
-                      idx (find-index root nm :name)]
-                  (swap! g/accounts update-in (conj update-path idx :bal)
-                         #(if (= (:type t) :to) (+ % (:val t)) (- % (:val t))))
-                  (recur (rest accs)
-                         (conj update-path idx :children)
-                         (:children (nth root idx))))))))
-        trans))
+(defn update-accounts [trans] (tu/update-accounts trans - +))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
@@ -103,7 +84,8 @@ more than once in a transaction!")
                             :else
                             (do #_(println @g/transactions)
                                 (swap! g/transactions conj
-                                       (conj @app-state {:date (u/jq->long date)}))
+                                       (conj @app-state {:id (count @g/transactions)
+                                                         :date (u/jq->long date)}))
                                 #_(println @g/transactions)
                                 (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))
