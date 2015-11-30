@@ -59,9 +59,12 @@
                                    :from (m->long (.month (.date prev 1) 0))}))
       "custom" (u/trans-view e {:href href}))))
 
-(defn rm [e t]
+(defn rm-helper [t]
   (tu/update-accounts (:trans t) + -)
-  (swap! g/transactions (fn [x] (remove #(= (:id t) (:id %)) x)))
+  (swap! g/transactions (fn [x] (remove #(= (:id t) (:id %)) x))))
+
+(defn rm [e t]
+  (rm-helper t)
   (u/trans-view nil (:attrs @g/app-page)))
 
 (defn edit [e t] (reset! g/app-page {:page :trans-edit :attrs {:id (:id t)}}))

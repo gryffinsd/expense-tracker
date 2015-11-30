@@ -18,6 +18,12 @@
      :home [nw/c-net-worth]
      :trans-add (do (reset! ta/app-state (ta/new-state))
                     [ta/c-add-transaction])
-     :trans-view [tv/c-view-transaction])])
+     :trans-view [tv/c-view-transaction]
+     :trans-edit (do (let [trans (first (filter #(= (:id (:attrs @g/app-page))
+                                                    (:id %))
+                                                @g/transactions))]
+                       (tv/rm-helper trans)
+                       (reset! ta/app-state trans))
+                     [ta/c-add-transaction]))])
 
 (defn main [] (r/render-component [c-main] (. js/document (getElementById "app"))))
