@@ -1,4 +1,6 @@
-(ns expense-tracker.accounts)
+(ns expense-tracker.account.utils
+  (:require [expense-tracker.globals :as g]
+            [expense-tracker.utils :as u]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -21,3 +23,15 @@
         (remove #(or (= % "asset") (= % "income")
                      (= % "liability") (= % "expense"))
                 (map #(subs % 1) (gan-helper accounts "" [])))))
+
+;; ["expenses" "vehicle"] -> [3 :children 1 :children]
+;; see globals.clj for reference
+(defn accs->indices [accounts]
+  (loop [accs accounts
+         root @g/accounts
+         rslt []]
+    (if (empty? accs)
+      (interleave rslt (repeat :children))
+      (recur (rest accs)
+             (:children (first (filter #(= (first accs) (:name %)) root)))
+             (conj rslt (u/find-index root (first accs) :name))))))

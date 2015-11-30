@@ -5,6 +5,7 @@
             [expense-tracker.menu :as m]
             [expense-tracker.transaction.add :as ta]
             [expense-tracker.transaction.view :as tv]
+            [expense-tracker.transaction.utils :as tu]
             [expense-tracker.account.view :as av]))
 
 (enable-console-print!)
@@ -24,7 +25,7 @@
      :trans-edit (do (let [trans (first (filter #(= (:id (:attrs @g/app-page))
                                                     (:id %))
                                                 @g/transactions))]
-                       (tv/rm-helper trans)
+                       (tu/rm-helper trans)
                        (reset! ta/app-state trans))
                      [ta/c-add-transaction]))])
 

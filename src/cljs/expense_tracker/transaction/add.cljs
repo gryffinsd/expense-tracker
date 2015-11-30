@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
-            [expense-tracker.accounts :as a]
+            [expense-tracker.account.utils :as au]
             [expense-tracker.transaction.utils :as tu]
             [clojure.string :as str]
             [jayq.core :as jq]))
@@ -27,7 +27,7 @@
 
 (defn acc-validate [e t]
   (let [acc (trim-empty? (.-value (.-target e)) :acc)]
-    (if (or (= acc "") (empty? (filter #(= acc %) (a/accs->names @g/accounts))))
+    (if (or (= acc "") (empty? (filter #(= acc %) (au/accs->names @g/accounts))))
       (u/alert "Non-existent account!")
       (swap! t assoc :acc acc))))
 
@@ -97,7 +97,7 @@ more than once in a transaction!")
                                 (reset! app-state (new-state))))))
             (snd [] (when (snn) (reset! g/app-page {:page :home})))]
       [:div [:datalist {:id "acc-names"}
-             (for [an (a/accs->names @g/accounts)]
+             (for [an (au/accs->names @g/accounts)]
                ^{:key (u/random)}[:option {:value an}])]
        [:div.row [:div.col-sm-12 [:label "Date"]
                   [:input.form-control {:id "trans-date"
