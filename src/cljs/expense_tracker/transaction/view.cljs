@@ -63,8 +63,9 @@
   (swap! g/transactions (fn [x] (remove #(= (:id t) (:id %)) x))))
 
 (defn rm [e t]
-  (rm-helper t)
-  (u/trans-view nil (:attrs @g/app-page)))
+  (when (u/confirm "Do you really want to delete this transaction?")
+    (rm-helper t)
+    (u/trans-view nil (:attrs @g/app-page))))
 
 (defn edit [e t] (reset! g/app-page {:page :trans-edit :attrs {:id (:id t)}}))
 
@@ -76,7 +77,9 @@
 
 (defn c-view-transaction []
   (let [href (:href (:attrs @g/app-page))
-        fltr (filter-transactions href (->> @g/app-page :attrs :from) (->> @g/app-page :attrs :to))]
+        from (->> @g/app-page :attrs :from)
+        to (->> @g/app-page :attrs :to)
+        fltr (filter-transactions href from to)]
     [:div [:p [:label "Filter-by"]
            [:select {:onChange #(ch-sel % href)}
             [:option {:value "all"} "All"]
