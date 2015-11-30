@@ -80,13 +80,18 @@
         from (->> @g/app-page :attrs :from)
         to (->> @g/app-page :attrs :to)
         fltr (filter-transactions href from to)]
-    [:div [:div #_[:p [:label "Breadcrumb"]
-                     (loop [accs (str/split href #":")
-                            prefix ""]
-                       [:span ">>"]
-                       (when-not (empty? accs)
-                         [:a {:href "#" :onClick nil} (first accs)]
-                         (recur (rest accs) (str prefix ":" (first accs)))))]
+    [:div [:div [:p [:label "Breadcrumb: "]
+                 (let [accs (str/split href #":")
+                       cnt (count accs)]
+                   [:span (for [i (range cnt)]
+                            ^{:key (u/random)}
+                            [:span [:a.text-capitalize
+                                    {:href "#"
+                                     :onClick #(u/trans-view
+                                                %
+                                                {:href (str/join ":" (take (inc i) accs))})}
+                                    (nth accs i)]
+                             [:span " >> "]])])]
              [:p [:label "Filter-by: "]
               [:select {:onChange #(ch-sel % href)}
                [:option {:value "all"} "All"]
