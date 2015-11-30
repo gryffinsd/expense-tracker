@@ -59,7 +59,7 @@
       "custom" (u/trans-view e {:href href}))))
 
 (defn rm-helper [t]
-  (tu/update-accounts (:trans t) + -)
+  (tu/update-accounts (:trans t) - +)
   (swap! g/transactions (fn [x] (remove #(= (:id t) (:id %)) x))))
 
 (defn rm [e t]

@@ -44,7 +44,7 @@
       (u/alert "Only numbers and decimal allowed!"))
     (swap! t assoc :val (if (= val "") 0 f))))
 
-(defn update-accounts [trans] (tu/update-accounts trans - +))
+(defn update-accounts [trans] (tu/update-accounts trans + -))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
