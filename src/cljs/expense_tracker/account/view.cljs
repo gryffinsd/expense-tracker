@@ -1,7 +1,6 @@
-(ns expense-tracker.net-worth
-  (:require [expense-tracker.globals :as g]
-            [expense-tracker.utils :as u]
-            [jayq.core :as jq]))
+(ns expense-tracker.account.view
+  (:require [expense-tracker.utils :as u]
+            [expense-tracker.globals :as g]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -19,7 +18,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
 
-(defn c-nw-helper [children path]
+(defn c-view-helper [children path]
   [:ul.list-unstyled {:className (if (u/contains path ":") "hidden" "show")}
    (map (fn [child idx]
           (let [nm (:name child)
@@ -31,19 +30,18 @@
                [:a.glyph {:href "#"}
                 [:span.glyphicon.glyphicon-collapse-down {:onClick toggle-ul}]])
              [:a.text-capitalize {:href "#" :onClick #(u/trans-view % {:href href})} nm]
-             [:span.pull-right (or (:bal child) 0)]
+             [:span.pull-right (:bal child)]
              (when grand-children
-               [c-nw-helper grand-children href])]))
+               [c-view-helper grand-children href])]))
         children (range))
    [:li.panel.panel-default [:span [:strong "Total"]]
-    [:span.pull-right [:strong (reduce + (map #(or (:bal %) 0)
-                                              children))]]]])
+    [:span.pull-right [:strong (reduce + (map :bal children))]]]])
 
-(defn c-net-worth []
+(defn c-view-account []
   [:div.row {:id "nw"}
    [:div.col-sm-6
-    [:h3 "Assets"] (c-nw-helper (get-children "asset") "asset")
-    [:h3 "Income"] (c-nw-helper (get-children "income") "income")]
+    [:h3 "Assets"] (c-view-helper (get-children "asset") "asset")
+    [:h3 "Income"] (c-view-helper (get-children "income") "income")]
    [:div.col-sm-6
-    [:h3 "Liabilities"] (c-nw-helper (get-children "liability") "liability")
-    [:h3 "Expenses"] (c-nw-helper (get-children "expense") "expense")]])
+    [:h3 "Liabilities"] (c-view-helper (get-children "liability") "liability")
+    [:h3 "Expenses"] (c-view-helper (get-children "expense") "expense")]])
