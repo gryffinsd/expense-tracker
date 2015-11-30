@@ -1,7 +1,6 @@
 (ns expense-tracker.transaction.view
   (:require [expense-tracker.utils :as u]
             [expense-tracker.globals :as g]
-            [expense-tracker.accounts :as a]
             [expense-tracker.transaction.utils :as tu]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

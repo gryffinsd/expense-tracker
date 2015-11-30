@@ -21,13 +21,15 @@
 ;; helpers
 
 (defn new-trans [typeof] {:id (count (:trans @app-state)) :val 0 :type typeof})
+(defn trim-empty? [val key]
+  (let [x (str/trim val)]
+    (if-not (empty? x) x (key @app-state))))
 
 (defn acc-validate [e t]
-  (let [acc (str/trim (.-value (.-target e)))]
-    (if (and (= (:acc @t) "")
-             (or (= acc "") (empty? (filter #(= acc %) (a/accs->names @g/accounts)))))
+  (let [acc (trim-empty? (.-value (.-target e)) :acc)]
+    (if (or (= acc "") (empty? (filter #(= acc %) (a/accs->names @g/accounts))))
       (u/alert "Non-existent account!")
-      (swap! t assoc :acc (if-not (= acc "") acc (:acc @t))))))
+      (swap! t assoc :acc acc))))
 
 (defn amt-equal [] (= (:to @app-state) (:from @app-state)))
 (defn amt-of [e t] (reset! tmp (:val @t)))
@@ -68,7 +70,8 @@
                                       update-in [:trans]
                                       conj (atom (new-trans to-from))))
             (datepicker [] (.datepicker (jq/$ "#trans-date")))
-            (snn [] (let [date (.-value (u/by-id "trans-date"))]
+            (snn [] (let [date (trim-empty? (u/jq->long (.-value (u/by-id "trans-date"))) :date)
+                          desc (trim-empty? (.-value (u/by-id "trans-desc")) :desc)]
                       (cond (or (zero? (:to @app-state))
                                 (zero? (:from @app-state))
                                 (not (amt-equal)))
@@ -85,7 +88,8 @@ more than once in a transaction!")
                             (do #_(println @g/transactions)
                                 (swap! g/transactions conj
                                        (conj @app-state {:id (count @g/transactions)
-                                                         :date (u/jq->long date)}))
+                                                         :date date
+                                                         :desc desc}))
                                 #_(println @g/transactions)
                                 (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))
@@ -99,18 +103,21 @@ more than once in a transaction!")
                                         :placeholder (:date @app-state)
                                         :onFocus datepicker}]]]
        [:div.row
-             [:div.col-sm-6
-              [:h2 "From Account(s)"
-               [:small.pull-right [:a {:href "#" :onClick #(split % :from)}
-                                   [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
-              [:ul.list-unstyled.clearfix (for [x froms] ^{:key (u/random)} [c-trans x])]
-              [:h3 "Total " [:span.pull-right (:from @app-state)]]]
-             [:div.col-sm-6
-              [:h2 "To Account(s)"
-               [:small.pull-right [:a {:href "#" :onClick #(split % :to)}
-                                   [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
-              [:ul.list-unstyled.clearfix (for [x tos] ^{:key (u/random)} [c-trans x])]
-              [:h3 "Total " [:span.pull-right (:to @app-state)]]]]
+        [:div.col-sm-6
+         [:h2 "From Account(s)"
+          [:small.pull-right [:a {:href "#" :onClick #(split % :from)}
+                              [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
+         [:ul.list-unstyled.clearfix (for [x froms] ^{:key (u/random)} [c-trans x])]
+         [:h3 "Total " [:span.pull-right (:from @app-state)]]]
+        [:div.col-sm-6
+         [:h2 "To Account(s)"
+          [:small.pull-right [:a {:href "#" :onClick #(split % :to)}
+                              [:span.glyphicon.glyphicon-plus-sign {:aria-hidden "true"}]]]]
+         [:ul.list-unstyled.clearfix (for [x tos] ^{:key (u/random)} [c-trans x])]
+         [:h3 "Total " [:span.pull-right (:to @app-state)]]]]
+       [:div.row [:div.col-sm-12 [:label "Description"]
+                  [:textarea.form-control {:id "trans-desc"}]]]
        [:div.row
+        [:p]
         [:div.col-sm-6 [:button.btn.btn-default.pull-right {:onClick snd} "Save and Done"]]
         [:div.col-sm-6 [:button.btn.btn-default {:onClick snn} "Save and New"]]]])))
