@@ -1,5 +1,6 @@
 (ns expense-tracker.utils
-  (:require [expense-tracker.globals :as g]))
+  (:require [expense-tracker.globals :as g]
+            [clojure.string :as str]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; utils
@@ -48,3 +49,16 @@
     (if (= (key (first hs)) needle)
       i
       (recur (rest hs) (inc i)))))
+
+(defn trim-empty? [app-state val key]
+  (let [x (str/trim val)]
+    (if-not (empty? x) x (key @app-state))))
+
+(defn amt-validate? [val]
+  (let [f (js/parseFloat val)
+        i (js/parseInt val)]
+    (if (or (= val "") ; empty string
+            (= i f) ; ending w/ decimal point
+            (= (str f) val))
+      f
+      nil)))

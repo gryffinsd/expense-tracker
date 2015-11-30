@@ -13,15 +13,7 @@
      [:ul.nav.navbar-nav
       [:li [:a {:href "#" :onClick #(ra % {:page :home})} "Home"]]
       [:li [:a {:href "#" :onClick #(ra % {:page :trans-add})} "Add Transaction"]]
-      [:li.dropdown [:a.dropdown-toggle {:href "#"
-                                         :data-toggle "dropdown"
-                                         :role "button"
-                                         :aria-haspopup "true"
-                                         :aria-expanded "false"}
-                     "Accounts" [:span.caret]]
-       [:ul.dropdown-menu
-        [:li [:a {:href "#" :onClick #(ra % {:page :acc-view})} "View"]]
-        [:li [:a {:href "#" :onClick #(ra % {:page :acc-add})} "Add New"]]]]
+      [:li [:a {:href "#" :onClick #(ra % {:page :acc-add})} "Add Account"]]
       [:li.dropdown [:a.dropdown-toggle {:href "#"
                                          :data-toggle "dropdown"
                                          :role "button"

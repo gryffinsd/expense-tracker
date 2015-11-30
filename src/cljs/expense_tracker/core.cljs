@@ -6,7 +6,8 @@
             [expense-tracker.transaction.add :as ta]
             [expense-tracker.transaction.view :as tv]
             [expense-tracker.transaction.utils :as tu]
-            [expense-tracker.account.view :as av]))
+            [expense-tracker.account.view :as av]
+            [expense-tracker.account.add :as aa]))
 
 (enable-console-print!)
 
@@ -18,6 +19,9 @@
    (condp = (:page @g/app-page)
      ;; home
      :home [av/c-view-account]
+     ;; accounts
+     :acc-add (do (reset! aa/app-state (aa/new-state))
+                  [aa/c-add-account])
      ;; transactions
      :trans-add (do (reset! ta/app-state (ta/new-state))
                     [ta/c-add-transaction])

@@ -14,6 +14,7 @@
   {:to 0 :from 0 :date ""
    :trans [(atom {:id 0 :type :to :val 0 :acc ""})
            (atom {:id 1 :type :from :val 0 :acc ""})]})
+;; this state isn't local coz it can be modified from /core
 (defonce app-state (r/atom (new-state)))
 (defonce tmp (atom 0))
 
@@ -21,12 +22,9 @@
 ;; helpers
 
 (defn new-trans [typeof] {:id (count (:trans @app-state)) :val 0 :type typeof})
-(defn trim-empty? [val key]
-  (let [x (str/trim val)]
-    (if-not (empty? x) x (key @app-state))))
 
 (defn acc-validate [e t]
-  (let [acc (trim-empty? (.-value (.-target e)) :acc)]
+  (let [acc (u/trim-empty? app-state (.-value (.-target e)) :acc)]
     (if (or (= acc "") (empty? (filter #(= acc %) (au/accs->names @g/accounts))))
       (u/alert "Non-existent account!")
       (swap! t assoc :acc acc))))
@@ -35,14 +33,9 @@
 (defn amt-of [e t] (reset! tmp (:val @t)))
 (defn amt-ob [e t] (swap! app-state update-in [(:type @t)] #(+ (- % @tmp) (:val @t))))
 (defn amt-validate [e t]
-  (let [val (.-value (.-target e))
-        f (js/parseFloat val)
-        i (js/parseInt val)]
-    (when-not (or (= val "") ; empty string
-                  (= i f) ; ending w/ decimal point
-                  (= (str f) val))
-      (u/alert "Only numbers and decimal allowed!"))
-    (swap! t assoc :val (if (= val "") 0 f))))
+  (if-let [f (u/amt-validate? (.-value (.-target e)))]
+    (swap! t assoc :val (if (= val "") 0 f))
+    (u/alert "Only numbers and decimal allowed!")))
 
 (defn update-accounts [trans] (tu/update-accounts trans + -))
 
@@ -69,11 +62,13 @@
     (letfn [(split [_ to-from] (swap! app-state
                                       update-in [:trans]
                                       conj (atom (new-trans to-from))))
-            (datepicker [] (.datepicker (jq/$ "#trans-date")))
-            (snn [] (let [date (let [d (trim-empty? (.-value (u/by-id "trans-date")) :date)
+            (datepicker [e] (.datepicker (jq/$ "#trans-date")))
+            (snn [e] (let [date (let [d (u/trim-empty? app-state
+                                                      (.-value (u/by-id "trans-date"))
+                                                      :date)
                                      dt (u/jq->long d)]
                                  (if (= dt "Invalid date") d dt))
-                          desc (trim-empty? (.-value (u/by-id "trans-desc")) :desc)]
+                          desc (u/trim-empty? app-state (.-value (u/by-id "trans-desc")) :desc)]
                       (cond (or (zero? (:to @app-state))
                                 (zero? (:from @app-state))
                                 (not (amt-equal)))
@@ -95,7 +90,7 @@ more than once in a transaction!")
                                 #_(println @g/transactions)
                                 (update-accounts (:trans @app-state))
                                 (reset! app-state (new-state))))))
-            (snd [] (when (snn) (reset! g/app-page {:page :home})))]
+            (snd [e] (when (snn e) (reset! g/app-page {:page :home})))]
       [:div [:datalist {:id "acc-names"}
              (for [an (au/accs->names @g/accounts)]
                ^{:key (u/random)}[:option {:value an}])]

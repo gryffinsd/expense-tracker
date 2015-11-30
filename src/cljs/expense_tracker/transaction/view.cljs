@@ -80,7 +80,7 @@
         from (->> @g/app-page :attrs :from)
         to (->> @g/app-page :attrs :to)
         fltr (filter-transactions href from to)]
-    [:div [:div [:p [:label "Breadcrumb: "]
+    [:div [:div [:div.form-group [:label "Breadcrumb: "]
                  (let [accs (str/split href #":")
                        cnt (count accs)]
                    [:span (for [i (range cnt)]
@@ -92,8 +92,8 @@
                                                 {:href (str/join ":" (take (inc i) accs))})}
                                     (nth accs i)]
                              [:span " >> "]])])]
-             [:p [:label "Filter-by: "]
-              [:select {:onChange #(ch-sel % href)}
+             [:div.form-group [:label "Filter-by: "]
+              [:select.form-control {:onChange #(ch-sel % href)}
                [:option {:value "all"} "All"]
                [:option {:value "cur-mon"} "Current Month"]
                [:option {:value "prev-mon"} "Previous Month"]
