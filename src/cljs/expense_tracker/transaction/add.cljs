@@ -70,7 +70,9 @@
                                       update-in [:trans]
                                       conj (atom (new-trans to-from))))
             (datepicker [] (.datepicker (jq/$ "#trans-date")))
-            (snn [] (let [date (trim-empty? (u/jq->long (.-value (u/by-id "trans-date"))) :date)
+            (snn [] (let [date (let [d (trim-empty? (.-value (u/by-id "trans-date")) :date)
+                                     dt (u/jq->long d)]
+                                 (if (= dt "Invalid date") d dt))
                           desc (trim-empty? (.-value (u/by-id "trans-desc")) :desc)]
                       (cond (or (zero? (:to @app-state))
                                 (zero? (:from @app-state))
