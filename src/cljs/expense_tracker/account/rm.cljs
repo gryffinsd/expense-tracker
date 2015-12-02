@@ -9,13 +9,7 @@
 ;; helpers
 
 (defn rm-trans [acc]
-  (mapv tu/rm-helper
-        (filter (fn [trans] (->> trans
-                                 :trans
-                                 (filter #(= acc (:acc @%)))
-                                 empty?
-                                 not))
-                @g/transactions)))
+  (mapv tu/rm-helper (tu/filter-transactions acc)))
 
 (defn rm-acc [acc]
   (let [accs (str/split acc #":")

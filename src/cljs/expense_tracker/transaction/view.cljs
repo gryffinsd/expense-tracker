@@ -3,6 +3,7 @@
             [expense-tracker.globals :as g]
             [expense-tracker.transaction.utils :as tu]
             [expense-tracker.account.rm :as ar]
+            [expense-tracker.account.manage :as am]
             [clojure.string :as str]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -129,5 +130,5 @@
                                             {:onClick #(trans-rm % f)}]]]]))]]]
      [:div.row
       [:p]
-      [:div.col-sm-6 [:button.btn.btn-default.pull-right {:onClick acc-edit} "Edit Account"]]
+      [:div.col-sm-6 [:button.btn.btn-default.pull-right {:onClick am/edit} "Edit Account"]]
       [:div.col-sm-6 [:button.btn.btn-default {:onClick ar/rm} "Delete Account"]]]]))
