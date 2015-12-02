@@ -64,32 +64,32 @@
                                       conj (atom (new-trans to-from))))
             (datepicker [e] (.datepicker (jq/$ "#trans-date")))
             (snn [e] (let [date (let [d (u/trim-empty? app-state
-                                                      (.-value (u/by-id "trans-date"))
-                                                      :date)
-                                     dt (u/jq->long d)]
-                                 (if (= dt "Invalid date") d dt))
-                          desc (u/trim-empty? app-state (.-value (u/by-id "trans-desc")) :desc)]
-                      (cond (or (zero? (:to @app-state))
-                                (zero? (:from @app-state))
-                                (not (amt-equal)))
-                            (u/alert "Amounts in both \"to\" and \"from\"
+                                                       (.-value (u/by-id "trans-date"))
+                                                       :date)
+                                      dt (u/jq->long d)]
+                                  (if (= dt "Invalid date") d dt))
+                           desc (u/trim-empty? app-state (.-value (u/by-id "trans-desc")) :desc)]
+                       (cond (or (zero? (:to @app-state))
+                                 (zero? (:from @app-state))
+                                 (not (amt-equal)))
+                             (u/alert "Amounts in both \"to\" and \"from\"
 accounts should be the same,
 and not-equal-to ZERO")
-                            (= date "")
-                            (u/alert "Date field cannot be empty!")
-                            (let [accs (mapv #(:acc @%) (:trans @app-state))]
-                              (not (= accs (into [] (into #{} accs)))))
-                            (u/alert "The same account cannot appear
+                             (= date "")
+                             (u/alert "Date field cannot be empty!")
+                             (let [accs (mapv #(:acc @%) (:trans @app-state))]
+                               (not (= accs (into [] (into #{} accs)))))
+                             (u/alert "The same account cannot appear
 more than once in a transaction!")
-                            :else
-                            (do #_(println @g/transactions)
-                                (swap! g/transactions conj
-                                       (conj @app-state {:id (count @g/transactions)
-                                                         :date date
-                                                         :desc desc}))
-                                #_(println @g/transactions)
-                                (update-accounts (:trans @app-state))
-                                (reset! app-state (new-state))))))
+                             :else
+                             (do #_(println @g/transactions)
+                                 (swap! g/transactions conj
+                                        (conj @app-state {:id (count @g/transactions)
+                                                          :date date
+                                                          :desc desc}))
+                                 #_(println @g/transactions)
+                                 (update-accounts (:trans @app-state))
+                                 (reset! app-state (new-state))))))
             (snd [e] (when (snn e) (reset! g/app-page {:page :home})))]
       [:div [:datalist {:id "acc-names"}
              (for [an (au/accs->names @g/accounts)]
