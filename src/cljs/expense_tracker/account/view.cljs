@@ -34,7 +34,7 @@
              [:span.pull-right (:bal child)]
              (when grand-children
                [c-view-helper grand-children href])]))
-        children (range))
+        (sort-by :name children) (range))
    [:li.panel.panel-default [:span [:strong "Total"]]
     [:span.pull-right [:strong (reduce + (map :bal children))]]]])
 
