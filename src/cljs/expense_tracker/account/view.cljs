@@ -23,7 +23,8 @@
    (map (fn [child idx]
           (let [nm (:name child)
                 href (str path ":" nm)
-                grand-children (:children child)]
+                grand-children (let [gc (:children child)]
+                                 (when-not (empty? gc) gc))]
             ^{:key (u/random)}
             [:li {:className (if (zero? (mod idx 2)) "bg-warning" "bg-info")}
              (when grand-children
