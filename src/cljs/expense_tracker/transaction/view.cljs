@@ -51,14 +51,17 @@
                                  :from (m->long (.subtract now 90 "days"))})
       "cur-yr" (u/trans-view e {:href href :to today
                                 :from (m->long (.month (.date now 1) 0))})
-      "prev-mon" (let [prev (.subtract now 1 "months")]
+      ;; .subtract/.date mutates now/prev :((
+      "prev-mon" (let [prev-to (.subtract (u/now) 1 "months")
+                       prev-from (.subtract (u/now) 1 "months")]
                    (u/trans-view e {:href href
-                                    :to (m->long (.date prev 31))
-                                    :from (m->long (.date prev 1))}))
-      "prev-yr" (let [prev (.subtract now 1 "years")]
+                                    :to (m->long (.date prev-to (.daysInMonth prev-to)))
+                                    :from (m->long (.date prev-from 1))}))
+      "prev-yr" (let [prev-to (.subtract (u/now) 1 "years")
+                      prev-from (.subtract (u/now) 1 "years")]
                   (u/trans-view e {:href href
-                                   :to (m->long (.month (.date prev 31) 12))
-                                   :from (m->long (.month (.date prev 1) 0))}))
+                                   :to (m->long (.date (.month prev-to 11) 31))
+                                   :from (m->long (.date (.month prev-from 0) 1))}))
       "custom" (u/trans-view e {:href href}))))
 
 (defn trans-rm [e t]
