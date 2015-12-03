@@ -1,7 +1,6 @@
 (ns expense-tracker.core
   (:require [reagent.core :as r]
             [expense-tracker.globals :as g]
-            [expense-tracker.utils :as u]
             [expense-tracker.menu :as m]
             [expense-tracker.transaction.add :as ta]
             [expense-tracker.transaction.view :as tv]
@@ -41,6 +40,8 @@
                                                 @g/transactions))]
                        (tu/rm-helper trans)
                        (reset! ta/app-state trans))
-                     [ta/c-add]))])
+                     [ta/c-add])
+     ;; reports
+     :rep-pie [rp/c-pie])])
 
 (defn main [] (r/render-component [c-main] (. js/document (getElementById "app"))))

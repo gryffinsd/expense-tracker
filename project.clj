@@ -16,7 +16,9 @@
                  [enlive "1.1.6"]
                  [reagent "0.5.1"]
                  [environ "1.0.0"]
-                 [jayq "2.5.4"]]
+                 [jayq "2.5.4"]
+                 [cljsjs/c3 "0.4.10-0"]
+                 [cljsjs/d3 "3.5.7-1"]] ; needed by c3
 
   :plugins [[lein-cljsbuild "1.0.5"]
             [lein-environ "1.0.0"]]
