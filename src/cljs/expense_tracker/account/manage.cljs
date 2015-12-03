@@ -67,7 +67,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components and views
 
-(defn c-add-account []
+(defn c-add []
   (let [edit? (:edit? @app-state)]
     [:div [:div.form-group [:label "Account Name"]
            [:input.form-control {:type "text"

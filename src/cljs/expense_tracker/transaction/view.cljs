@@ -79,7 +79,7 @@
 (defn c-acc [[href _]]
   [:a {:href "#" :onClick #(u/trans-view % {:href href}) :style {:margin-right "1em"}} href])
 
-(defn c-view-transaction []
+(defn c-view []
   (let [href (:href (:attrs @g/app-page))
         from (->> @g/app-page :attrs :from)
         to (->> @g/app-page :attrs :to)

@@ -56,7 +56,7 @@
      [:p.del [:a {:href "#" :onClick rm}
           [:span.glyphicon.glyphicon-minus-sign {:aria-hidden "true"}]]]]))
 
-(defn c-add-transaction []
+(defn c-add []
   (let [tos (filter #(= :to (:type @%)) (:trans @app-state))
         froms (filter #(= :from (:type @%)) (:trans @app-state))]
     (letfn [(split [_ to-from] (swap! app-state

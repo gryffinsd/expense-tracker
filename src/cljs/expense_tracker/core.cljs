@@ -8,6 +8,7 @@
             [expense-tracker.transaction.utils :as tu]
             [expense-tracker.account.view :as av]
             [expense-tracker.account.manage :as am]
+            [expense-tracker.report.pie :as rp]
             [clojure.string :as str]))
 
 (enable-console-print!)
@@ -22,7 +23,7 @@
      :home [av/c-view-account]
      ;; accounts
      :acc-add (do (reset! am/app-state (am/new-state nil "" nil))
-                  [am/c-add-account])
+                  [am/c-add])
      :acc-edit (let [href (-> @g/app-page :attrs :href)
                      nm (-> href (str/split #":") last)
                      parent (->> href
@@ -30,16 +31,16 @@
                                  (drop-last 1)
                                  (str/join ":"))]
                  (reset! am/app-state (am/new-state true nm parent))
-                 [am/c-add-account])
+                 [am/c-add])
      ;; transactions
      :trans-add (do (reset! ta/app-state (ta/new-state))
-                    [ta/c-add-transaction])
-     :trans-view [tv/c-view-transaction]
+                    [ta/c-add])
+     :trans-view [tv/c-view]
      :trans-edit (do (let [trans (first (filter #(= (:id (:attrs @g/app-page))
                                                     (:id %))
                                                 @g/transactions))]
                        (tu/rm-helper trans)
                        (reset! ta/app-state trans))
-                     [ta/c-add-transaction]))])
+                     [ta/c-add]))])
 
 (defn main [] (r/render-component [c-main] (. js/document (getElementById "app"))))
