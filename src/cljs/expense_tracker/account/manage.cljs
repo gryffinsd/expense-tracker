@@ -34,7 +34,6 @@
   (if-let [f (u/amt-validate? (.-value (.-target e)))]
     (let [amt (if (= val "") 0 f)]
       (swap! app-state assoc
-             :init-bal amt
              :bal amt))
     (u/alert "Only numbers and decimal allowed!")))
 
@@ -46,10 +45,10 @@
 (defn snn [e]
   (let [nm (str/lower-case (u/trim-empty? app-state (.-value (u/by-id "name")) :name))
         parent (.-value (u/by-id "parent"))
-        init-bal (let [b (.-value (u/by-id "init-bal"))] (if (empty? b) 0 b))]
+        bal (:bal @app-state)]
     (if (= nm "")
       (u/alert "Account name cannot be empty!")
-      (do (acc-add {:name nm :parent parent :init-bal init-bal :bal init-bal})
+      (do (acc-add {:name nm :parent parent :init-bal bal :bal bal})
           (when (:edit? @app-state)
             (let [old (:href (:attrs @g/app-page))
                   new (str parent ":" nm)]
