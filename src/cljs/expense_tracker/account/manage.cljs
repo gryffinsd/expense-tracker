@@ -10,10 +10,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; local states
 
-(defn new-state [edit? nm parent]
-  {:name nm :init-bal 0 :bal 0 :parent parent :edit? edit?})
+(defn new-state [edit? nm parent init-bal]
+  {:name nm :init-bal init-bal :bal 0 :parent parent :edit? edit?})
 ;; this state isn't local coz it can be modified from /core
-(defonce app-state (r/atom (new-state nil "" nil)))
+(defonce app-state (r/atom (new-state nil "" nil nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -56,7 +56,7 @@
               ;; remove old account
               (ar/rm-acc old)))
           (acc-add {:name nm :parent parent :init-bal bal :bal bal})
-          (reset! app-state (new-state nil "" nil)))
+          (reset! app-state (new-state nil "" nil nil)))
       (u/alert "Please correct errors first!"))))
 
 (defn snd [e] (when (snn e) (reset! g/app-page {:page :home})))
@@ -82,7 +82,8 @@
                             :placeholder (:name @app-state)
                             :onBlur name-ob}]]
      [:div.form-group [:label "Initial Balance"]
-      [:input.form-control {:type "text" :id "init-bal" :placeholder 0
+      [:input.form-control {:type "text" :id "init-bal"
+                            :placeholder (:init-bal @app-state)
                             :onBlur amt-ob}]]
      [:div.row
       [:p]

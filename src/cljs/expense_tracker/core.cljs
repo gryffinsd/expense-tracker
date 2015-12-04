@@ -5,6 +5,7 @@
             [expense-tracker.transaction.add :as ta]
             [expense-tracker.transaction.view :as tv]
             [expense-tracker.transaction.utils :as tu]
+            [expense-tracker.account.utils :as au]
             [expense-tracker.account.view :as av]
             [expense-tracker.account.manage :as am]
             [expense-tracker.report.pie :as rp]
@@ -21,15 +22,18 @@
      ;; home
      :home [av/c-view-account]
      ;; accounts
-     :acc-add (do (reset! am/app-state (am/new-state nil "" nil))
+     :acc-add (do (reset! am/app-state (am/new-state nil "" nil nil))
                   [am/c-add])
      :acc-edit (let [href (-> @g/app-page :attrs :href)
-                     nm (-> href (str/split #":") last)
-                     parent (->> href
-                                 (#(str/split % #":"))
+                     splt (str/split href #":")
+                     nm (last splt)
+                     parent (->> splt
                                  (drop-last 1)
-                                 (str/join ":"))]
-                 (reset! am/app-state (am/new-state true nm parent))
+                                 (str/join ":"))
+                     init-bal (get-in @g/accounts
+                                      (conj (vec (drop-last 1 (au/accs->indices splt)))
+                                            :init-bal))]
+                 (reset! am/app-state (am/new-state true nm parent (or init-bal 0)))
                  [am/c-add])
      ;; transactions
      :trans-add (do (reset! ta/app-state (ta/new-state))
