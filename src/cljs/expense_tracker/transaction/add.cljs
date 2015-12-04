@@ -25,7 +25,7 @@
 
 (defn acc-validate [e t]
   (let [acc (u/trim-empty? app-state (.-value (.-target e)) :acc)]
-    (if (or (= acc "") (empty? (filter #(= acc %) (au/accs->names @g/accounts))))
+    (if (or (= acc "") (empty? (filter #(= acc %) (au/filtered-accs->names @g/accounts))))
       (u/alert "Non-existent account!")
       (swap! t assoc :acc acc))))
 
@@ -92,7 +92,7 @@ more than once in a transaction!")
                                  (reset! app-state (new-state))))))
             (snd [e] (when (snn e) (reset! g/app-page {:page :home})))]
       [:div [:datalist {:id "acc-names"}
-             (for [an (au/accs->names @g/accounts)]
+             (for [an (au/filtered-accs->names @g/accounts)]
                ^{:key (u/random)}[:option {:value an}])]
        [:div.row [:div.col-sm-12 [:label "Date"]
                   [:input.form-control {:id "trans-date"
