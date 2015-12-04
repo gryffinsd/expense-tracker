@@ -58,7 +58,6 @@
               (tu/replay new)
               ;; remove old account
               (ar/rm-acc old)))
-          (u/alert "New account added successfully!")
           (reset! app-state (new-state nil "" nil))))))
 
 (defn snd [e] (when (snn e) (reset! g/app-page {:page :home})))
@@ -71,7 +70,6 @@
     [:div [:div.form-group [:label "Account Name"]
            [:input.form-control {:type "text"
                                  :id "name"
-                                 :placeholder (if-let [nm (:name @app-state)] nm "")
                                  :onBlur name-ob}]]
      [:div.form-group [:label "Parent Account"]
       (if edit?
@@ -88,7 +86,11 @@
      [:div.row
       [:p]
       [:div.col-sm-6 [:button.btn.btn-default.pull-right {:onClick snd} "Save and Done"]]
-      (when-not edit? [:div.col-sm-6 [:button.btn.btn-default {:onClick snn} "Save and New"]])]]))
+      (when-not edit? [:div.col-sm-6
+                       [:button.btn.btn-default
+                        {:onClick (fn [e] (snn e)
+                                    (u/alert "Added/edited account successfully!"))}
+                        "Save and New"]])]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main
