@@ -19,23 +19,22 @@
 ;; helpers
 
 (defn name-ob [e]
-  (let [val (u/trim-empty? app-state (.-value (.-target e)) :name)
+  (let [val (str/lower-case (u/trim-empty? app-state (.-value (.-target e)) :name))
+        parent (.-value (u/by-id "parent"))
         accs (au/accs->names @g/accounts)]
-    (cond (= val "")
-          (u/alert "Account name cannot be empty!")
-
-          (u/contains (str/join " " accs) (str (.-value (u/by-id "parent")) ":" val))
-          (u/alert "An account with the same name (and parent) already exists!")
-
-          :else
-          (swap! app-state assoc :name val))))
+    (if (or (= val "")
+            (not (empty? (filter #(= (str parent ":" val) %) accs))))
+      (do (if (= val "")
+            (u/alert "Account name cannot be empty!")
+            (u/alert "An account with the same name (and parent) already exists!"))
+          (swap! app-state assoc :name nil :parent parent))
+      (swap! app-state assoc :name val :parent parent))))
 
 (defn amt-ob [e t]
-  (if-let [f (u/amt-validate? (.-value (.-target e)))]
-    (let [amt (if (= val "") 0 f)]
-      (swap! app-state assoc
-             :bal amt))
-    (u/alert "Only numbers and decimal allowed!")))
+  (let [val (.-value (.-target e))]
+    (if-let [f (u/amt-validate? val)]
+      (swap! app-state assoc :bal (if (= val "") 0 f))
+      (u/alert "Only numbers and decimal allowed!"))))
 
 (defn acc-add [acc]
   (swap! g/accounts
@@ -43,13 +42,11 @@
          conj (dissoc acc :parent)))
 
 (defn snn [e]
-  (let [nm (str/lower-case (u/trim-empty? app-state (.-value (u/by-id "name")) :name))
+  (let [nm (:name @app-state)
         parent (.-value (u/by-id "parent"))
         bal (:bal @app-state)]
-    (if (= nm "")
-      (u/alert "Account name cannot be empty!")
-      (do (acc-add {:name nm :parent parent :init-bal bal :bal bal})
-          (when (:edit? @app-state)
+    (if (and nm parent bal)
+      (do (when (:edit? @app-state)
             (let [old (:href (:attrs @g/app-page))
                   new (str parent ":" nm)]
               ;; update new name in transactions
@@ -58,7 +55,9 @@
               (tu/replay new)
               ;; remove old account
               (ar/rm-acc old)))
-          (reset! app-state (new-state nil "" nil))))))
+          (acc-add {:name nm :parent parent :init-bal bal :bal bal})
+          (reset! app-state (new-state nil "" nil)))
+      (u/alert "Please correct errors first!"))))
 
 (defn snd [e] (when (snn e) (reset! g/app-page {:page :home})))
 
@@ -67,19 +66,21 @@
 
 (defn c-add []
   (let [edit? (:edit? @app-state)]
-    [:div [:div.form-group [:label "Account Name"]
-           [:input.form-control {:type "text"
-                                 :id "name"
-                                 :onBlur name-ob}]]
-     [:div.form-group [:label "Parent Account"]
-      (if edit?
-        [:input.form-control {:type "text"
-                              :id "parent"
-                              :disabled true
-                              :value (:parent @app-state)}]
-        [:select.form-control {:id "parent"}
-         (for [an (au/accs->names @g/accounts)]
-           ^{:key (u/random)}[:option {:value an} an])])]
+    [:div [:div.form-group [:label "Parent Account"]
+           (if edit?
+             [:input.form-control {:type "text"
+                                   :id "parent"
+                                   :disabled true
+                                   :value (:parent @app-state)}]
+             [:select.form-control {:id "parent"
+                                    :value (:parent @app-state)}
+              (for [an (au/accs->names @g/accounts)]
+                ^{:key (u/random)}[:option {:value an} an])])]
+     [:div.form-group [:label "Account Name"]
+      [:input.form-control {:type "text"
+                            :id "name"
+                            :placeholder (:name @app-state)
+                            :onBlur name-ob}]]
      [:div.form-group [:label "Initial Balance"]
       [:input.form-control {:type "text" :id "init-bal" :placeholder 0
                             :onBlur amt-ob}]]
