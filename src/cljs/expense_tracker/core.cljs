@@ -16,7 +16,7 @@
 ;; main
 
 (defn c-main []
-  [:div.container [m/c-menu]
+  [:div [m/c-menu]
    (condp = (:page @g/app-page)
      ;; home
      :home [av/c-view-account]
